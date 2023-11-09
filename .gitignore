@@ -1,2 +1,2 @@
-graphs/*.exe
-strings/*.exe
+*/*.exe
+*/.cph
