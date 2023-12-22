@@ -55,71 +55,20 @@ using namespace std;
 #define vpi vector<pair<int, int>>
 
 
-void print(vector<int> &par,int x)
-{
-    vi vv;
-    vv.pb(x);
-    int i=x;
-    while(i!=-1)
-    {
-        vv.pb(par[i]);
-        i=par[i];
-    }
-    vv.pop_back();
-    reverse(vv.begin(),vv.end());
-    pen(vv.size());
-    for(auto i: vv)
-    cout<<i+1<<" ";
-   
-}
-
 void solve()
 {
     
     int n,m;
-    cin >> n >> m;
-
-    vector<vector<int>> adj(n);
-
+    cin>>n>>m;
+    vector<vector<int>> adj(n+1);
     for(int i=0;i<m;i++)
     {
         int a,b;
-        cin >> a>>b;
-        a--;
-        b--;
-        adj[a].push_back(b);
-        adj[b].push_back(a);
+        cin>>a>>b;
+        adj[a].pb(b);
+        adj[b].pb(a);
     }
 
-    vector<int> vis(n,0);
-    vector<int> par(n,-1);
-    vis[0]=1;
-    queue<int> q;
-    q.push(0);
-    while(q.size())
-    {
-        auto it= q.front();
-        q.pop();
-
-        vis[it]=1;
-        for(auto i: adj[it])
-        {
-            if(vis[i])
-            continue;
-
-            vis[i]=1;
-            par[i]=it;
-            q.push(i);
-
-            if(i==n-1)
-            {
-                print(par,n-1);
-                return;
-            }
-        }
-    }
-
-    pen("IMPOSSIBLE");
     return;
 }
 

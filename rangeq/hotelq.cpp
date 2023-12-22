@@ -12,7 +12,6 @@ using namespace std;
     ios_base::sync_with_stdio(false); \
     cin.tie(NULL);                    \
     cout.tie(NULL)
-#define ll long long int
 #define vli vector<long long int>
 #define vi vector<int>
 #define mod 1000000007
@@ -54,72 +53,119 @@ using namespace std;
 #define mpi map<int, int>
 #define vpi vector<pair<int, int>>
 
+class Segtree{
+    public:
 
-void print(vector<int> &par,int x)
-{
-    vi vv;
-    vv.pb(x);
-    int i=x;
-    while(i!=-1)
+    struct node{
+        int mx;
+        node(){
+            this->mx =0;
+        }
+        node(int val)
+        {
+            this->mx = val;
+        }
+    };
+
+    vector<node> segarr;
+
+
+    Segtree(int n)
     {
-        vv.pb(par[i]);
-        i=par[i];
+        segarr.resize(4*n+3);
     }
-    vv.pop_back();
-    reverse(vv.begin(),vv.end());
-    pen(vv.size());
-    for(auto i: vv)
-    cout<<i+1<<" ";
-   
-}
+
+    node merge(node &a,node &b)
+    {
+        node ans;
+        ans.mx= max(a.mx,b.mx);
+        return ans;
+    }
+
+    void build(int id,int l,int r,vi &vec)
+    {
+        if(l==r)
+        {
+            segarr[id] = node(vec[l]);
+            return;
+        }
+
+        int md= l + (r-l)/2;
+        build(2*id,l,md,vec);
+        build(2*id+1,md+1,r,vec);
+        segarr[id] = merge(segarr[2*id],segarr[2*id+1]);
+        return;
+    }
+
+    void update(int id,int l,int r,int pos,int val)
+    {
+        if(l==r)
+        {
+            segarr[id].mx -= val;
+            return;
+        }
+
+        if(pos<l || pos>r)
+        return;
+
+        int md = l+(r-l)/2;
+        if(pos<=md)
+        update(2*id,l,md,pos,val);
+        if(pos>md)
+        update(2*id+1,md+1,r,pos,val);
+        segarr[id] = merge(segarr[2*id],segarr[2*id+1]);
+        return;
+    }
+
+    int query(int id,int l,int r,int x)
+    {
+        if(l==r)
+        {
+            return segarr[id].mx >= x ? l : -1;
+        }
+
+        int lt = segarr[2*id].mx;
+        int rt = segarr[2*id+1].mx;
+
+        int md = l+(r-l)/2;
+
+        if(lt>=x)
+        return query(2*id,l,md,x);
+
+        if(rt>=x)
+        return query(2*id+1,md+1,r,x);
+
+        return -1;
+    }
+
+};
 
 void solve()
 {
     
     int n,m;
-    cin >> n >> m;
+    cin >> n>>m;
+    vi vec(n);
+    vi grp(m);
+    take(vec);
+    take(grp);
+    vi ans;
 
-    vector<vector<int>> adj(n);
+    Segtree at(n);
+    at.build(1,0,n-1,vec);
 
-    for(int i=0;i<m;i++)
+    for(auto i: grp)
     {
-        int a,b;
-        cin >> a>>b;
-        a--;
-        b--;
-        adj[a].push_back(b);
-        adj[b].push_back(a);
-    }
-
-    vector<int> vis(n,0);
-    vector<int> par(n,-1);
-    vis[0]=1;
-    queue<int> q;
-    q.push(0);
-    while(q.size())
-    {
-        auto it= q.front();
-        q.pop();
-
-        vis[it]=1;
-        for(auto i: adj[it])
+        int pos = at.query(1,0,n-1,i);
+        if(pos==-1)
         {
-            if(vis[i])
+            ans.pb(0);
             continue;
-
-            vis[i]=1;
-            par[i]=it;
-            q.push(i);
-
-            if(i==n-1)
-            {
-                print(par,n-1);
-                return;
-            }
         }
+        ans.pb(pos+1);
+        at.update(1,0,n-1,pos,i);
     }
-
-    pen("IMPOSSIBLE");
+    show(ans);
     return;
 }
 

@@ -54,79 +54,64 @@ using namespace std;
 #define mpi map<int, int>
 #define vpi vector<pair<int, int>>
 
-
-void print(vector<int> &par,int x)
-{
-    vi vv;
-    vv.pb(x);
-    int i=x;
-    while(i!=-1)
-    {
-        vv.pb(par[i]);
-        i=par[i];
-    }
-    vv.pop_back();
-    reverse(vv.begin(),vv.end());
-    pen(vv.size());
-    for(auto i: vv)
-    cout<<i+1<<" ";
-   
-}
-
 void solve()
 {
-    
-    int n,m;
+    int n, m;
     cin >> n >> m;
 
-    vector<vector<int>> adj(n);
+    vector<vector<int>> adj(n+1);
 
-    for(int i=0;i<m;i++)
+    for (int i = 0; i < m; i++)
     {
-        int a,b;
-        cin >> a>>b;
-        a--;
-        b--;
-        adj[a].push_back(b);
-        adj[b].push_back(a);
+        int a, b;
+        cin >> a >> b;
+        adj[a].pb(b);
+        adj[b].pb(a);
+
     }
 
-    vector<int> vis(n,0);
-    vector<int> par(n,-1);
-    vis[0]=1;
-    queue<int> q;
-    q.push(0);
-    while(q.size())
+    vector<int> col(n+1,0);
+
+    for(int i=1;i<=n;i++)
     {
-        auto it= q.front();
-        q.pop();
-
-        vis[it]=1;
-        for(auto i: adj[it])
+        if(col[i]==0)
         {
-            if(vis[i])
-            continue;
-
-            vis[i]=1;
-            par[i]=it;
+            col[i]=1;
+            queue<int> q;
             q.push(i);
 
-            if(i==n-1)
+            while(q.size())
             {
-                print(par,n-1);
-                return;
+                auto it=q.front();
+                q.pop();
+
+                for(auto j: adj[it])
+                {
+                    if(col[j]==col[it])
+                    {
+                        pen("IMPOSSIBLE");
+                        return;
+                    }
+
+                    if(col[j]!=0)
+                    continue;
+
+                    col[j] = (col[it]==1?2:1);
+                    q.push(j);
+                }
             }
         }
     }
 
-    pen("IMPOSSIBLE");
-    return;
+    col.erase(col.begin());
+    show(col);
+    
 }
 
 signed main()
 {
     fastio();
-    int t=1;
+    int t = 1;
     while (t--)
     {
         solve();

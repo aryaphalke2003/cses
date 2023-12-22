@@ -12,7 +12,6 @@ using namespace std;
     ios_base::sync_with_stdio(false); \
     cin.tie(NULL);                    \
     cout.tie(NULL)
-#define ll long long int
 #define vli vector<long long int>
 #define vi vector<int>
 #define mod 1000000007
@@ -55,71 +54,51 @@ using namespace std;
 #define vpi vector<pair<int, int>>
 
 
-void print(vector<int> &par,int x)
-{
-    vi vv;
-    vv.pb(x);
-    int i=x;
-    while(i!=-1)
-    {
-        vv.pb(par[i]);
-        i=par[i];
-    }
-    vv.pop_back();
-    reverse(vv.begin(),vv.end());
-    pen(vv.size());
-    for(auto i: vv)
-    cout<<i+1<<" ";
-   
-}
-
 void solve()
 {
+    int n,q;
+    cin >> n >> q;
+
+    vector<vector<int>> vec(n,vector<int>(n,0));
+
+    for(int i=0;i<n;i++)
+    {
+        string s;
+        cin >> s;
+
+        for(int j=0;j<n;j++)
+        if(s[j]=='*')
+        vec[i][j]=1;
+    }
     
-    int n,m;
-    cin >> n >> m;
 
-    vector<vector<int>> adj(n);
+    vector<vector<int>> pre(n+1,vector<int>(n+1,0));
 
-    for(int i=0;i<m;i++)
+    //2d prefix sum
+
+    for(int i=1;i<=n;i++)
     {
-        int a,b;
-        cin >> a>>b;
-        a--;
-        b--;
-        adj[a].push_back(b);
-        adj[b].push_back(a);
-    }
-
-    vector<int> vis(n,0);
-    vector<int> par(n,-1);
-    vis[0]=1;
-    queue<int> q;
-    q.push(0);
-    while(q.size())
-    {
-        auto it= q.front();
-        q.pop();
-
-        vis[it]=1;
-        for(auto i: adj[it])
+        for(int j=1;j<=n;j++)
         {
-            if(vis[i])
-            continue;
-
-            vis[i]=1;
-            par[i]=it;
-            q.push(i);
-
-            if(i==n-1)
-            {
-                print(par,n-1);
-                return;
-            }
-        }
+            pre[i][j] = vec[i-1][j-1];
+            pre[i][j] += pre[i][j-1];//one shot
+            pre[i][j] += pre[i-1][j];//one shot
+            pre[i][j] -= pre[i-1][j-1];//double counted
+        }   
     }
 
-    pen("IMPOSSIBLE");
+    // for(int i=1;i<=n;i++)
+    // for(int j=0;j<=n;j++)
+    // pre[i][j] += pre[i-1][j];
+
+    while(q--)
+    {
+        int a,b,c,d;
+        cin>>a>>b>>c>>d;
+
+        pen(pre[c][d]-pre[a-1][d]-pre[c][b-1]+pre[a-1][b-1]);
+    }
+
     return;
 }
 
